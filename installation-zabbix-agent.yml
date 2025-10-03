@@ -40,7 +40,7 @@
     - name: Ajout hostname
       lineinfile:
         dest: /etc/zabbix/zabbix_agentd.conf
-        regexp: '^Hostname='
+        regexp: '^?Hostname='
         line: "Hostname={{ ansible_facts['hostname'] }}"
 
     - name: Ajout HostInterface
@@ -52,7 +52,7 @@
     - name: Ajout HostMetadata
       lineinfile:
         dest: /etc/zabbix/zabbix_agentd.conf
-        regexp: '^HostMetadata='
+        regexp: '^?HostMetadata='
         line: "HostMetadata={{ ansible_facts['hostname'] }}"
 
     - name: Redémarrage de l'agent Zabbix
