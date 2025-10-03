@@ -8,8 +8,7 @@ Ce projet permet d’installer et de configurer automatiquement Zabbix Agent sur
 
 Installer Ansible sur ta machine de gestion (Ubuntu/Debian) :
 
-sudo apt update
-sudo apt install ansible -y
+sudo apt update && sudo apt install ansible -y
 
 
 Cloner ce dépôt :
