@@ -1,0 +1,62 @@
+---
+- name: Install and configure Zabbix agent
+  hosts: prod
+  become: yes
+  tasks:
+
+    - name: Récupération du paquet release Zabbix
+      get_url:
+        url: https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-5+debian12_all.deb
+        dest: /tmp/
+
+    - name: gestion packet zabbix-agent
+      command: dpkg -i "/tmp/zabbix-release_6.0-5+debian12_all.deb"
+      args:
+        creates: /etc/apt/sources.list.d/zabbix.list
+          
+    - name: Mise à jour des dépôts
+      apt:
+        update_cache: yes
+        upgrade: yes
+
+    - name: Installation de l'agent Zabbix
+      apt:
+        name: zabbix-agent
+        state: present 
+
+    - name: Ajout ServerActive
+      lineinfile:
+        dest: /etc/zabbix/zabbix_agentd.conf
+        regexp: '^#?ServerActive='
+        line: "ServerActive=172.16.243.141"
+
+    - name: Ajout Server
+      lineinfile:
+        dest: /etc/zabbix/zabbix_agentd.conf
+        regexp: '^#?Server='
+        line: "Server=172.16.243.141"
+
+
+    - name: Ajout hostname
+      lineinfile:
+        dest: /etc/zabbix/zabbix_agentd.conf
+        regexp: '^Hostname='
+        line: "Hostname={{ ansible_facts['hostname'] }}"
+
+    - name: Ajout HostInterface
+      lineinfile:
+        dest: /etc/zabbix/zabbix_agentd.conf
+        regexp: '^#?HostInterface='
+        line: "HostInterface={{ ansible_default_ipv4['address'] }}" 
+
+    - name: Ajout HostMetadata
+      lineinfile:
+        dest: /etc/zabbix/zabbix_agentd.conf
+        regexp: '^HostMetadata='
+        line: "HostMetadata={{ ansible_facts['hostname'] }}"
+
+    - name: Redémarrage de l'agent Zabbix
+      service:
+        name: zabbix-agent
+        state: restarted
+        enabled: yes
